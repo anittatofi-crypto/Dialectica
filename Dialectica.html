@@ -1,0 +1,1393 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Dialéctica — El arte de aprender inglés</title>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Syne:wght@700;800&display=swap" rel="stylesheet"/>
+<style>
+:root {
+  --bg:#0f0f0f;
+  --bg2:#1a1a1a;
+  --surface:#1e1e1e;
+  --surface2:#252525;
+  --surface3:#2f2f2f;
+  --border:#2a2a2a;
+  --border2:#383838;
+  --text:#f0f0f0;
+  --text2:#909090;
+  --text3:#555555;
+  --accent:#f5c518;
+  --accent-bg:rgba(245,197,24,0.08);
+  --accent-text:#f5c518;
+  --green:#4ade80;
+  --green-bg:rgba(74,222,128,0.08);
+  --red:#f87171;
+  --red-bg:rgba(248,113,113,0.08);
+  --amber:#fbbf24;
+  --amber-bg:rgba(251,191,36,0.08);
+  --radius:10px;
+  --radius-lg:16px;
+  --shadow:0 1px 3px rgba(0,0,0,.4),0 1px 2px rgba(0,0,0,.3);
+  --shadow-md:0 8px 32px rgba(0,0,0,.6);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh}
+h1,h2,h3{font-family:'DM Serif Display',serif}
+
+/* ── TOAST ── */
+#toast{position:fixed;bottom:24px;right:24px;background:#f0f0f0;color:#fff;padding:10px 16px;border-radius:var(--radius);font-size:13px;z-index:9999;opacity:0;transform:translateY(8px);transition:all .25s;pointer-events:none}
+#toast.show{opacity:1;transform:translateY(0)}
+
+/* ── SPINNER ── */
+#loader{position:fixed;inset:0;background:var(--bg);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;gap:16px}
+#loader h2{font-size:22px;color:var(--text)}
+.spinner{width:36px;height:36px;border:3px solid var(--border);border-top-color:var(--accent);border-radius:50%;animation:spin .7s linear infinite}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ── LOGIN ── */
+#login-screen{display:none;min-height:100vh;align-items:center;justify-content:center;padding:24px}
+.login-box{background:var(--surface);border-radius:var(--radius-lg);box-shadow:var(--shadow-md);padding:40px;width:100%;max-width:420px}
+.login-logo{font-family:'DM Serif Display',serif;font-size:28px;color:var(--text);margin-bottom:6px}
+.login-sub{font-size:14px;color:var(--text2);margin-bottom:28px}
+.login-tabs{display:flex;gap:4px;margin-bottom:24px;background:var(--surface2);border-radius:8px;padding:3px}
+.login-tab{flex:1;padding:8px;text-align:center;font-size:13px;font-weight:500;border-radius:6px;cursor:pointer;color:var(--text2);transition:all .15s}
+.login-tab.active{background:var(--surface);color:var(--text);box-shadow:0 1px 3px rgba(0,0,0,0.1)}
+.form-group{margin-bottom:16px}
+.form-group label{display:block;font-size:12px;font-weight:500;color:var(--text2);margin-bottom:6px;letter-spacing:.02em;text-transform:uppercase}
+.form-group input,.form-group select{width:100%;padding:10px 12px;border:1.5px solid var(--border);border-radius:var(--radius);font-size:14px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);transition:border-color .15s;outline:none}
+.form-group input:focus,.form-group select:focus{border-color:var(--accent)}
+.btn-login{width:100%;padding:12px;background:var(--accent);color:#fff;border:none;border-radius:var(--radius);font-size:15px;font-weight:500;font-family:'DM Sans',sans-serif;cursor:pointer;transition:background .15s;margin-top:4px}
+.btn-login:hover{background:#d4a800}
+.error-msg{background:rgba(248,113,113,0.08);color:#f87171;padding:10px 12px;border-radius:8px;font-size:13px;margin-bottom:16px;display:none}
+
+/* ── APP SHELL ── */
+#app{display:none;height:100vh;flex-direction:column}
+.topnav{background:var(--surface);border-bottom:1px solid var(--border);padding:0 24px;display:flex;align-items:center;justify-content:space-between;height:56px;flex-shrink:0}
+.topnav-brand{font-family:'DM Serif Display',serif;font-size:20px;color:var(--text)}
+.topnav-right{display:flex;align-items:center;gap:12px}
+.user-pill{display:flex;align-items:center;gap:8px;background:var(--surface2);border-radius:20px;padding:5px 12px 5px 5px;font-size:13px}
+.avatar{width:28px;height:28px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:600;flex-shrink:0}
+.av-t{background:rgba(245,197,24,0.08);color:#f5c518}
+.av-s{background:rgba(74,222,128,0.08);color:#4ade80}
+.btn-out{padding:6px 12px;font-size:12px;background:transparent;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-family:'DM Sans',sans-serif;color:var(--text2)}
+.btn-out:hover{background:var(--surface2)}
+
+/* ── LAYOUT ── */
+.body-wrap{display:flex;flex:1;overflow:hidden}
+.sidebar{width:210px;background:var(--surface);border-right:1px solid var(--border);display:flex;flex-direction:column;flex-shrink:0;overflow-y:auto}
+.nav-sec{font-size:10px;font-weight:600;color:var(--text3);padding:16px 16px 4px;letter-spacing:.08em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:9px;padding:8px 12px;margin:1px 8px;border-radius:8px;font-size:13px;color:var(--text2);cursor:pointer;transition:all .15s}
+.nav-item:hover{background:var(--surface2);color:var(--text)}
+.nav-item.active{background:var(--accent-bg);color:var(--accent-text);font-weight:500}
+.nav-icon{font-size:15px;width:20px;text-align:center}
+.main-content{flex:1;overflow-y:auto;padding:24px}
+
+/* ── PAGE HEADER ── */
+.page-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.page-title{font-size:22px;color:var(--text)}
+.page-sub{font-size:13px;color:var(--text2);margin-top:2px}
+
+/* ── CARDS / GRID ── */
+.grid-4{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin-bottom:20px}
+.grid-2{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-bottom:16px}
+.grid-3{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:16px}
+.card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:16px 20px}
+.stat-card{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:16px}
+.stat-label{font-size:12px;color:var(--text2);margin-bottom:4px}
+.stat-value{font-size:26px;font-family:'DM Serif Display',serif;color:var(--text)}
+.stat-delta{font-size:12px;margin-top:4px;color:var(--text2)}
+
+/* ── SECTIONS ── */
+.section{display:none}
+.section.active{display:block}
+
+/* ── TABLE ── */
+.table-wrap{border-radius:var(--radius-lg);border:1px solid var(--border);overflow:hidden;background:var(--surface)}
+table{width:100%;border-collapse:collapse;font-size:13px}
+th{text-align:left;padding:10px 14px;font-size:11px;font-weight:600;color:var(--text2);background:var(--surface2);border-bottom:1px solid var(--border);text-transform:uppercase;letter-spacing:.04em}
+td{padding:10px 14px;border-bottom:1px solid var(--border);color:var(--text);vertical-align:middle}
+tr:last-child td{border-bottom:none}
+tr:hover td{background:#252525}
+
+/* ── BADGES ── */
+.badge{display:inline-flex;align-items:center;padding:2px 9px;border-radius:20px;font-size:11px;font-weight:600}
+.bg{background:var(--green-bg);color:var(--green)}
+.bb{background:var(--accent-bg);color:var(--accent-text)}
+.ba{background:var(--amber-bg);color:var(--amber)}
+.br{background:var(--red-bg);color:var(--red)}
+.bgr{background:var(--surface2);color:var(--text2)}
+
+/* ── BUTTONS ── */
+.btn{padding:7px 14px;font-size:13px;border-radius:8px;cursor:pointer;border:1.5px solid var(--border);background:var(--surface);color:var(--text);font-family:'DM Sans',sans-serif;transition:all .15s}
+.btn:hover{background:var(--surface2)}
+.btn-primary{background:var(--accent);color:#fff;border-color:var(--accent)}
+.btn-primary:hover{background:#d4a800}
+.btn-sm{padding:4px 10px;font-size:12px}
+.btn-danger{background:var(--red-bg);color:var(--red);border-color:rgba(248,113,113,0.2)}
+
+/* ── ATTEND ── */
+.att-btn{width:30px;height:30px;border-radius:50%;border:1.5px solid var(--border);background:var(--surface);cursor:pointer;font-size:13px;display:inline-flex;align-items:center;justify-content:center;transition:all .15s}
+.att-p{background:var(--green-bg);border-color:rgba(74,222,128,0.2);color:var(--green)}
+.att-a{background:var(--red-bg);border-color:rgba(248,113,113,0.2);color:var(--red)}
+.att-t{background:var(--amber-bg);border-color:rgba(251,191,36,0.2);color:var(--amber)}
+
+/* ── PROGRESS ── */
+.prog-bar{height:6px;background:var(--surface2);border-radius:3px;overflow:hidden}
+.prog-fill{height:100%;border-radius:3px}
+.skill-row{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:13px}
+.skill-lbl{width:72px;color:var(--text2);flex-shrink:0}
+
+/* ── MODAL ── */
+.modal-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:500;align-items:center;justify-content:center;padding:20px}
+.modal-overlay.open{display:flex}
+.modal-box{background:var(--surface);border-radius:var(--radius-lg);padding:28px;width:100%;max-width:480px;box-shadow:var(--shadow-md)}
+.modal-hdr{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px}
+.modal-title{font-size:18px;color:var(--text)}
+.ig{margin-bottom:14px}
+.ig label{display:block;font-size:12px;font-weight:600;color:var(--text2);margin-bottom:5px;letter-spacing:.02em;text-transform:uppercase}
+.ig input,.ig select,.ig textarea{width:100%;padding:9px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:14px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text);outline:none}
+.ig input:focus,.ig select:focus,.ig textarea:focus{border-color:var(--accent)}
+.ig textarea{resize:vertical;min-height:80px}
+.modal-footer{display:flex;gap:8px;justify-content:flex-end;margin-top:20px}
+
+/* ── LESSONS ── */
+.lesson-card{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius-lg);padding:16px;cursor:pointer;transition:all .15s}
+.lesson-card:hover{box-shadow:var(--shadow-md);border-color:rgba(245,197,24,0.2)}
+.lesson-card.locked{opacity:.5;cursor:not-allowed}
+.skill-chip{display:inline-flex;padding:3px 9px;border-radius:20px;font-size:11px;font-weight:600;margin-bottom:8px}
+
+/* ── EXERCISES ── */
+.ex-tab{padding:7px 16px;border-radius:8px;border:1.5px solid var(--border);font-size:13px;cursor:pointer;background:var(--surface);color:var(--text2);font-family:'DM Sans',sans-serif}
+.ex-tab.active{background:var(--accent-bg);border-color:rgba(245,197,24,0.2);color:var(--accent-text);font-weight:500}
+.ex-box{background:var(--surface2);border-radius:var(--radius);padding:18px;margin-bottom:12px}
+.ex-q{font-size:14px;font-weight:500;color:var(--text);margin-bottom:12px}
+.ex-opt{display:flex;align-items:center;gap:10px;padding:9px 14px;margin:5px 0;border:1.5px solid var(--border);border-radius:8px;cursor:pointer;font-size:14px;background:var(--surface);transition:all .15s}
+.ex-opt:hover{border-color:var(--accent);background:var(--accent-bg)}
+.ex-opt.correct{border-color:rgba(74,222,128,0.2);background:var(--green-bg);color:var(--green)}
+.ex-opt.wrong{border-color:rgba(248,113,113,0.2);background:var(--red-bg);color:var(--red)}
+.ex-opt.disabled{pointer-events:none}
+
+/* ── GRADE INPUT ── */
+.grade-in{width:54px;text-align:center;padding:5px;border-radius:6px;border:1.5px solid var(--border);font-size:13px;font-family:'DM Sans',sans-serif;background:var(--surface);color:var(--text)}
+.grade-in:focus{border-color:var(--accent);outline:none}
+
+/* ── STUDENT ATTENDANCE CALENDAR ── */
+.att-day{width:20px;height:20px;border-radius:4px;display:inline-flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;margin:2px}
+
+/* ── CONFIG SECTION ── */
+.config-section{background:var(--surface);border-radius:var(--radius-lg);border:1px solid var(--border);padding:20px;margin-bottom:16px}
+.config-title{font-size:15px;font-weight:500;color:var(--text);margin-bottom:4px}
+.config-desc{font-size:13px;color:var(--text2);margin-bottom:14px}
+.firebase-steps{background:#f0f9ff;border:1px solid rgba(245,197,24,0.2);border-radius:var(--radius);padding:16px;font-size:13px;line-height:1.8;color:#f5c518}
+.firebase-steps code{background:#2f2f2f;padding:1px 5px;border-radius:4px;font-family:monospace;font-size:12px}
+.config-connected{background:var(--green-bg);border:1px solid rgba(74,222,128,0.2);border-radius:var(--radius);padding:12px 16px;font-size:13px;color:var(--green);display:none;align-items:center;gap:8px}
+.config-connected.show{display:flex}
+</style>
+</head>
+<body>
+
+<!-- LOADER -->
+<div id="loader">
+  <div class="logo-big"><span class="lg-d">Di</span><span class="lg-i">a</span><span class="lg-rest">l</span><span class="lg-i">é</span><span class="lg-rest">ctic</span><span class="lg-i">a</span></div>
+  <div class="logo-sub-txt">El arte de aprender inglés</div>
+  <div class="spinner"></div>
+</div>
+
+<!-- LOGIN -->
+<div id="login-screen">
+<div class="login-wrap">
+  <div class="login-left">
+    <div style="text-align:center;max-width:300px">
+      <div class="logo-big" style="font-size:46px;margin-bottom:8px"><span class="lg-d">Di</span><span class="lg-i">a</span><span class="lg-rest">l</span><span class="lg-i">é</span><span class="lg-rest">ctic</span><span class="lg-i">a</span></div>
+      <div class="logo-sub-txt" style="margin-bottom:36px">El arte de aprender inglés</div>
+      <div class="feat"><div class="feat-ic">✅</div>Asistencia diaria automática</div>
+      <div class="feat"><div class="feat-ic">📚</div>5 cursos English for Adults</div>
+      <div class="feat"><div class="feat-ic">🎛</div>Exámenes controlados por el maestro</div>
+      <div class="feat"><div class="feat-ic">📊</div>Calificaciones en tiempo real</div>
+      <div class="feat"><div class="feat-ic">🎓</div>Panel alumno / maestro separado</div>
+    </div>
+  </div>
+  <div class="login-right">
+    <div class="login-box">
+      <div class="lbox-title">Bienvenido</div>
+      <div class="lbox-sub">Inicia sesión en la plataforma Dialéctica</div>
+      <div class="ltabs">
+        <div class="ltab active" id="tab-teacher" onclick="switchLoginTab('teacher')">Maestro</div>
+        <div class="ltab" id="tab-student" onclick="switchLoginTab('student')">Alumno</div>
+      </div>
+      <div id="login-error" class="err-msg"></div>
+      <div class="fg"><label>Correo electrónico</label><input type="email" id="login-email" placeholder="correo@dialectica.mx" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <div class="fg"><label>Contraseña</label><input type="password" id="login-pass" placeholder="••••••••" onkeydown="if(event.key==='Enter')doLogin()"/></div>
+      <button class="btn-login" id="login-btn" onclick="doLogin()">Entrar →</button>
+      <div id="setup-hint" style="display:none;margin-top:14px;padding:12px;background:var(--amber-bg);border-radius:var(--radius);font-size:12px;color:var(--amber);border:1px solid rgba(251,191,36,.2);line-height:1.8">
+        ⚙️ <strong>Modo demo activo</strong> — Firebase no configurado.<br>
+        Maestro: <code style="background:var(--surface3);padding:1px 5px;border-radius:3px">maestro@demo.com</code> / <code style="background:var(--surface3);padding:1px 5px;border-radius:3px">demo1234</code><br>
+        Alumno: <code style="background:var(--surface3);padding:1px 5px;border-radius:3px">alumno@demo.com</code> / <code style="background:var(--surface3);padding:1px 5px;border-radius:3px">demo1234</code>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+<!-- APP -->
+<div id="app">
+  <div class="topnav">
+    <div class="tnlogo"><span class="lg-d">Di</span><span class="lg-i">a</span><span class="lg-rest">l</span><span class="lg-i">é</span><span class="lg-rest">ctic</span><span class="lg-i">a</span></div>
+    <div class="tnright">
+      <div class="upill">
+        <div class="avatar" id="nav-avatar">??</div>
+        <span id="nav-name" style="font-size:13px;font-weight:500;color:var(--text)"></span>
+        <span id="nav-role" style="font-size:11px;color:var(--text2)"></span>
+      </div>
+      <button class="btn-out" onclick="doLogout()">Salir</button>
+    </div>
+  </div>
+  <div class="body-wrap">
+    <div class="sidebar" id="sidebar"></div>
+    <div class="main-content" id="main-content"></div>
+  </div>
+</div>
+
+<!-- MODAL -->
+<div class="mo" id="modal">
+  <div class="mb">
+    <div class="mh"><div class="mt" id="modal-title"></div><button class="btn btn-sm" onclick="closeModal()">✕</button></div>
+    <div id="modal-body"></div>
+    <div class="mf" id="modal-footer"></div>
+  </div>
+</div>
+<div id="toast"></div>
+<div id="toast"></div>
+
+<!-- FIREBASE SDKs -->
+<script type="module">
+import { initializeApp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-app.js';
+import { getAuth, signInWithEmailAndPassword, signOut, onAuthStateChanged, createUserWithEmailAndPassword } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-auth.js';
+import { getFirestore, doc, setDoc, getDoc, collection, getDocs, query, where, serverTimestamp } from 'https://www.gstatic.com/firebasejs/10.12.2/firebase-firestore.js';
+
+// ══════════════════════════════════════════════
+//  🔧 FIREBASE CONFIG — Reemplaza con tus datos
+// ══════════════════════════════════════════════
+const FIREBASE_CONFIG = {
+  apiKey: "AIzaSyC9hiO0FJ2yQxhnCsDmGAJ7t3BcSuwU8iM",
+  authDomain: "escuela-ingles.firebaseapp.com",
+  projectId: "escuela-ingles",
+  storageBucket: "escuela-ingles.firebasestorage.app",
+  messagingSenderId: "954177706939",
+  appId: "1:954177706939:web:ed973710fe8df39e1c029e"
+};
+let fb=null,auth=null,db=null,FIREBASE_READY=false;
+try{if(FIREBASE_CONFIG.apiKey!=="TU_API_KEY"){fb=initializeApp(FIREBASE_CONFIG);auth=getAuth(fb);db=getFirestore(fb);FIREBASE_READY=true;}}catch(e){console.warn("Firebase:",e);}
+
+// ══════════════════════════════════════════════
+//  CURSOS — English for Adults (5 niveles)
+// ══════════════════════════════════════════════
+const COURSES=[
+  {id:'EFA1',name:'English for Adults 1',level:'Beginner',desc:'Saludos, números, familia, colores, rutinas básicas.',units:[
+    {id:'U1A',title:'Unit 1 — Hello!',lessons:[
+      {id:'L_1A1',title:'Greetings & Introductions',type:'info',skill:'Speaking',content:'Aprende a decir hello, goodbye e introducirte. Frases clave: "My name is...", "Nice to meet you", "How are you?"'},
+      {id:'L_1A2',title:'The Alphabet & Numbers 1–100',type:'info',skill:'Listening',content:'Practica el alfabeto inglés y los números del 1 al 100. Pronunciación de letras difíciles como W, Y, J.'},
+      {id:'L_1A3',title:'Quiz — Unit 1',type:'exam',skill:'Grammar',questions:[
+        {q:'How do you say "Mucho gusto" in English?',opts:['Good morning','Nice to meet you','See you later','Thank you'],ans:1},
+        {q:'What number comes after "nineteen"?',opts:['Twenty','Ninety','Twelve','Eleven'],ans:0},
+        {q:'Choose the correct morning greeting:',opts:['Good night','Good evening','Good morning','Good afternoon'],ans:2},
+      ]},
+    ]},
+    {id:'U1B',title:'Unit 2 — My World',lessons:[
+      {id:'L_1B1',title:'Family Members',type:'info',skill:'Vocabulary',content:'Vocabulario de familia: mother, father, brother, sister, grandparents, cousins, aunt, uncle, wife, husband.'},
+      {id:'L_1B2',title:'Colors & Basic Adjectives',type:'info',skill:'Vocabulary',content:'Colores y adjetivos básicos: big/small, tall/short, young/old, happy/sad, fast/slow, hot/cold.'},
+      {id:'L_1B3',title:'My Daily Routine',type:'info',skill:'Speaking',content:'Describe tu día en presente simple: "I wake up at 7 AM. I eat breakfast. I go to work. I go to bed at 11 PM."'},
+      {id:'L_1B4',title:'Tarea — Describe tu familia',type:'homework',skill:'Writing',content:'Escribe 6-8 oraciones describiendo a tu familia. Usa el vocabulario de la Unidad 2.'},
+      {id:'L_1B5',title:'Examen — Unit 2',type:'exam',skill:'Grammar',questions:[
+        {q:'What is the plural of "child"?',opts:['Childs','Children','Childrens','Childer'],ans:1},
+        {q:'"She ___ tall and has brown hair."',opts:['is','are','am','be'],ans:0},
+        {q:'What color is the sky on a clear day?',opts:['Green','Red','Blue','Yellow'],ans:2},
+      ]},
+    ]},
+  ]},
+  {id:'EFA2',name:'English for Adults 2',level:'Elementary',desc:'Presente simple y continuo, trabajo, tiempo libre.',units:[
+    {id:'U2A',title:'Unit 3 — Daily Life',lessons:[
+      {id:'L_2A1',title:'Simple Present — Habits & Facts',type:'info',skill:'Grammar',content:'Usa Simple Present para hábitos y hechos. "I work every day." Tercera persona: agrega -s/-es. "She drinks coffee."'},
+      {id:'L_2A2',title:'Present Continuous — Right Now',type:'info',skill:'Grammar',content:'Usa Present Continuous para acciones que pasan ahora. "I am studying." "They are watching TV." Forma: am/is/are + verb-ing.'},
+      {id:'L_2A3',title:'Free Time Activities',type:'info',skill:'Vocabulary',content:'Pasatiempos: reading, cooking, playing sports, watching movies, traveling, listening to music, painting, dancing.'},
+      {id:'L_2A4',title:'Examen — Unit 3',type:'exam',skill:'Grammar',questions:[
+        {q:'"She ___ (watch) TV right now."',opts:['watch','watches','is watching','watched'],ans:2},
+        {q:'Which sentence uses Simple Present correctly?',opts:['He is go to school every day.','He goes to school every day.','He going to school every day.','He go to school every day.'],ans:1},
+        {q:'What is "cocinar" in English?',opts:['Painting','Dancing','Cooking','Reading'],ans:2},
+      ]},
+    ]},
+    {id:'U2B',title:'Unit 4 — Work & Jobs',lessons:[
+      {id:'L_2B1',title:'Jobs & Occupations',type:'info',skill:'Vocabulary',content:'Profesiones: teacher, doctor, engineer, lawyer, chef, nurse, architect, programmer, accountant, mechanic, police officer.'},
+      {id:'L_2B2',title:'Describing Your Job',type:'info',skill:'Speaking',content:'Habla sobre tu trabajo: "I work at...", "My job involves...", "I am responsible for...", "I deal with customers."'},
+      {id:'L_2B3',title:'Tarea — My Ideal Job',type:'homework',skill:'Writing',content:'Escribe un párrafo (8-10 oraciones) sobre tu trabajo actual o ideal. ¿Qué haces? ¿Dónde trabajas? ¿Por qué te gusta?'},
+      {id:'L_2B4',title:'Examen — Unit 4',type:'exam',skill:'Grammar',questions:[
+        {q:'What does a "nurse" do?',opts:['Builds houses','Teaches students','Takes care of patients','Prepares food'],ans:2},
+        {q:'"I ___ for a technology company."',opts:['work','works','working','am work'],ans:0},
+        {q:'Which one is a profession?',opts:['Running','Engineer','Happy','Quickly'],ans:1},
+      ]},
+    ]},
+  ]},
+  {id:'EFA3',name:'English for Adults 3',level:'Pre-Intermediate',desc:'Pasado simple, viajes, salud, compras.',units:[
+    {id:'U3A',title:'Unit 5 — Past Experiences',lessons:[
+      {id:'L_3A1',title:'Simple Past — Regular Verbs',type:'info',skill:'Grammar',content:'Agrega -ed a verbos regulares: work→worked, talk→talked, play→played, visit→visited, watch→watched.'},
+      {id:'L_3A2',title:'Simple Past — Irregular Verbs',type:'info',skill:'Grammar',content:'Verbos irregulares comunes: go→went, have→had, see→saw, eat→ate, buy→bought, make→made, come→came, take→took.'},
+      {id:'L_3A3',title:'Talking About the Past',type:'info',skill:'Speaking',content:'Expresiones de tiempo: yesterday, last week, last year, ago, in 2020. "I went to Guadalajara last summer."'},
+      {id:'L_3A4',title:'Examen — Unit 5',type:'exam',skill:'Grammar',questions:[
+        {q:'What is the past tense of "go"?',opts:['Goed','Went','Gone','Goes'],ans:1},
+        {q:'"She ___ (buy) a new phone yesterday."',opts:['buyed','buy','bought','buys'],ans:2},
+        {q:'Which time expression goes with Past Simple?',opts:['Right now','Tomorrow','Last week','Next year'],ans:2},
+      ]},
+    ]},
+    {id:'U3B',title:'Unit 6 — Health & Travel',lessons:[
+      {id:'L_3B1',title:'Body Parts & Health Problems',type:'info',skill:'Vocabulary',content:'Partes del cuerpo: head, chest, back, stomach, arm, leg. Problemas: headache, cold, fever, sore throat, broken bone, allergy.'},
+      {id:'L_3B2',title:'At the Doctor',type:'info',skill:'Speaking',content:'Frases útiles: "I have a headache.", "It hurts here.", "How long have you had this?", "Take this medicine twice a day."'},
+      {id:'L_3B3',title:'Travel Vocabulary',type:'info',skill:'Vocabulary',content:'Vocabulario de viajes: airport, hotel, passport, boarding pass, reservation, check-in, luggage, itinerary, destination.'},
+      {id:'L_3B4',title:'Tarea — My Last Trip',type:'homework',skill:'Writing',content:'Escribe sobre un viaje que hiciste. ¿A dónde fuiste? ¿Cómo viajaste? ¿Qué hiciste? ¿Qué comiste?'},
+      {id:'L_3B5',title:'Examen — Unit 6',type:'exam',skill:'Grammar',questions:[
+        {q:'What do you need to travel internationally?',opts:['Credit card','Passport','Notebook','Calculator'],ans:1},
+        {q:'"I ___ a stomachache."',opts:['have','has','am','are'],ans:0},
+        {q:'Where do you check in for a flight?',opts:['The hotel','The bus station','The airport','The train station'],ans:2},
+      ]},
+    ]},
+  ]},
+  {id:'EFA4',name:'English for Adults 4',level:'Intermediate',desc:'Present perfect, futuro, condicionales, inglés de negocios.',units:[
+    {id:'U4A',title:'Unit 7 — Present Perfect',lessons:[
+      {id:'L_4A1',title:'Present Perfect — Structure & Use',type:'info',skill:'Grammar',content:'Forma: have/has + participio pasado. "I have visited Paris." "She has never eaten sushi." Usos: experiencias de vida, eventos recientes, tiempo no terminado.'},
+      {id:'L_4A2',title:'For, Since, Already, Yet, Ever',type:'info',skill:'Grammar',content:'"I have studied English for 3 years." "She has lived here since 2019." "Have you ever tried Thai food?" "I have not finished yet."'},
+      {id:'L_4A3',title:'Examen — Unit 7',type:'exam',skill:'Grammar',questions:[
+        {q:'Choose the correct sentence:',opts:['I have seen that movie yesterday.','I saw that movie yesterday.','I have saw that movie.','I seen it.'],ans:1},
+        {q:'"She ___ already finished her homework."',opts:['has','have','had','is'],ans:0},
+        {q:'"They ___ lived here since 2015."',opts:['has','have','had','were'],ans:1},
+      ]},
+    ]},
+    {id:'U4B',title:'Unit 8 — Future & Conditionals',lessons:[
+      {id:'L_4B1',title:'Future: Will & Going To',type:'info',skill:'Grammar',content:'"Will" para predicciones y decisiones espontáneas. "Going to" para planes. "It will rain." "I am going to study tonight."'},
+      {id:'L_4B2',title:'Making Plans & Arrangements',type:'info',skill:'Speaking',content:'Frases: "Let\'s meet at...", "How about...?", "I\'m planning to...", "Would you like to...?", "Shall we...?"'},
+      {id:'L_4B3',title:'Conditional Type 1 (Real)',type:'info',skill:'Grammar',content:'Condiciones reales: If + Present Simple, will + verbo base. "If it rains, I will stay home." "If you study hard, you will pass."'},
+      {id:'L_4B4',title:'Tarea — My 5-Year Plan',type:'homework',skill:'Writing',content:'Escribe sobre tus planes para los próximos 5 años. Usa "will", "going to" y condicionales tipo 1.'},
+      {id:'L_4B5',title:'Examen — Unit 8',type:'exam',skill:'Grammar',questions:[
+        {q:'"If I study hard, I ___ pass the exam."',opts:['will','would','am','have'],ans:0},
+        {q:'Which expresses a concrete plan?',opts:['I will maybe travel','I am going to travel to Japan in July','Travel Japan maybe','Japan I go'],ans:1},
+        {q:'"___ you like to join us for dinner?"',opts:['Do','Are','Would','Should'],ans:2},
+      ]},
+    ]},
+  ]},
+  {id:'EFA5',name:'English for Adults 5',level:'Upper-Intermediate',desc:'Tiempos perfectos, voz pasiva, reported speech, inglés de negocios avanzado.',units:[
+    {id:'U5A',title:'Unit 9 — Advanced Grammar',lessons:[
+      {id:'L_5A1',title:'Past Perfect',type:'info',skill:'Grammar',content:'Had + participio para acciones antes de otra acción pasada. "I had eaten before she arrived." "They had already left when I called."'},
+      {id:'L_5A2',title:'Passive Voice',type:'info',skill:'Grammar',content:'Be + participio pasado. Activa: "They built this in 1990." Pasiva: "This was built in 1990." Se usa cuando el agente es desconocido o irrelevante.'},
+      {id:'L_5A3',title:'Reported Speech',type:'info',skill:'Grammar',content:'Directo: "I love this city." Reportado: "She said she loved that city." Cambios: am→was, have→had, will→would, can→could.'},
+      {id:'L_5A4',title:'Examen — Unit 9',type:'exam',skill:'Grammar',questions:[
+        {q:'Change to passive: "The company fired 50 employees."',opts:['50 employees was fired','50 employees were fired by the company','The company were fired','50 employees fired'],ans:1},
+        {q:'"He said he ___ tired."',opts:['is','was','were','be'],ans:1},
+        {q:'By the time I arrived, the meeting ___ already started.',opts:['has','have','had','was'],ans:2},
+      ]},
+    ]},
+    {id:'U5B',title:'Unit 10 — Business English',lessons:[
+      {id:'L_5B1',title:'Emails & Professional Writing',type:'info',skill:'Writing',content:'Aperturas: "Dear Mr./Ms. [Name]," Cierres: "Best regards," "Yours sincerely." Frases: "Please find attached...", "I would like to request..."'},
+      {id:'L_5B2',title:'Meetings & Presentations',type:'info',skill:'Speaking',content:'Iniciar reunión: "Let\'s get started." Presentaciones: "Today I\'m going to talk about...", "As you can see from this chart..."'},
+      {id:'L_5B3',title:'Tarea — Write a Business Email',type:'homework',skill:'Writing',content:'Escribe un correo formal solicitando información sobre un producto o servicio. Usa apertura, cuerpo y cierre correctos.'},
+      {id:'L_5B4',title:'Examen Final — Unit 10',type:'exam',skill:'Grammar',questions:[
+        {q:'Which is a formal email opening?',opts:['Hey John!!','Yo John,','Dear Mr. Johnson,','Sup John,'],ans:2},
+        {q:'"___ find attached the report you requested."',opts:['You can','Please','Here','Kindly'],ans:1},
+        {q:'In a meeting, "Let\'s table that" means:',opts:['Discuss it now','Put it aside for later','Write it on the table','Delete it'],ans:1},
+      ]},
+    ]},
+  ]},
+];
+
+// ══════════════════════════════════════════════
+//  ESTADO GLOBAL
+// ══════════════════════════════════════════════
+let currentUser = null; // { uid, email, name, role, groupId }
+let loginRole = 'teacher';
+let activeSection = '';
+
+// Demo data (modo sin Firebase)
+const DEMO_USERS = {
+  'maestro@demo.com': { pass:'demo1234', name:'Prof. Martínez', role:'teacher', uid:'t1' },
+  'alumno@demo.com':  { pass:'demo1234', name:'Andrea López',   role:'student', uid:'s1', groupId:'GA' }
+};
+
+const DEMO_STUDENTS = [
+  {id:'s1', name:'Andrea López',    email:'andrea@demo.com',  groupId:'GA', level:'B1'},
+  {id:'s2', name:'Carlos Rivas',    email:'carlos@demo.com',  groupId:'GA', level:'B1'},
+  {id:'s3', name:'María Torres',    email:'maria@demo.com',   groupId:'GA', level:'B1'},
+  {id:'s4', name:'José Hernández',  email:'jose@demo.com',    groupId:'GA', level:'B1'},
+  {id:'s5', name:'Sofía Méndez',    email:'sofia@demo.com',   groupId:'GA', level:'B1'},
+  {id:'s6', name:'Diego Cruz',      email:'diego@demo.com',   groupId:'GA', level:'B1'},
+  {id:'s7', name:'Valeria Reyes',   email:'valeria@demo.com', groupId:'GB', level:'A2'},
+  {id:'s8', name:'Andrés Morales',  email:'andres@demo.com',  groupId:'GB', level:'A2'},
+];
+
+const DEMO_GROUPS = [
+  {id:'GA', name:'Grupo A', level:'B1', schedule:'Lun–Vie 08:00', room:'Lab 2',  teacherId:'t1'},
+  {id:'GB', name:'Grupo B', level:'A2', schedule:'Lun–Mié 17:00', room:'Aula 1', teacherId:'t1'},
+];
+
+const DEMO_LESSONS = [
+  {id:'L1', unit:3, order:1, title:'3.1 Daily Routines',     skill:'Listening', done:true,  desc:'Listening comprehension about daily schedules'},
+  {id:'L2', unit:3, order:2, title:'3.2 Describing People',  skill:'Speaking',  done:true,  desc:'Practice describing physical appearance'},
+  {id:'L3', unit:3, order:3, title:'3.3 Present Perfect',    skill:'Grammar',   done:true,  desc:'Formation and use of present perfect tense'},
+  {id:'L4', unit:3, order:4, title:'3.4 Reading: A Day in the Life', skill:'Reading', done:false, desc:'Read and answer questions about a text'},
+  {id:'L5', unit:3, order:5, title:'3.5 Email Writing',      skill:'Writing',   done:false, desc:'Write a formal and informal email'},
+  {id:'L6', unit:3, order:6, title:'3.6 Unit 3 Quiz',        skill:'Grammar',   done:false, desc:'Assessment for all Unit 3 skills'},
+];
+
+const DEMO_EXERCISES = [
+  {id:'E1', lessonId:'L1', title:'Listening 3.1', questions:[
+    {q:'What time does Maria usually wake up?', opts:['6:00 AM','7:00 AM','8:00 AM','6:30 AM'], ans:0},
+    {q:'What does she do after breakfast?',     opts:['Goes for a walk','Reads the news','Takes a shower','Calls a friend'], ans:1},
+    {q:'How does she go to work?',              opts:['By car','By bus','On foot','By bicycle'], ans:2},
+  ]},
+  {id:'E2', lessonId:'L3', title:'Present Perfect', questions:[
+    {q:'Choose the correct sentence:', opts:['I have seen that movie yesterday.','I saw that movie yesterday.','I have saw that movie.','I seen it yesterday.'], ans:1},
+    {q:'"She ___ already finished her homework."', opts:['has','have','had','is'], ans:0},
+    {q:'Which is correct?', opts:['They has been here before.','They have been here before.','They been here before.','They are been here.'], ans:1},
+  ]},
+  {id:'E3', lessonId:'L2', title:'Vocabulary & Speaking', questions:[
+    {q:'Complete: "I usually ___ to school by bus."', opts:['go','goes','going','went'], ans:0},
+    {q:"What's the opposite of \"early\"?", opts:['slow','fast','late','soon'], ans:2},
+    {q:'She has ___ hair.', opts:['short, dark','dark, short','shorts, darks','darking, shorting'], ans:0},
+  ]},
+];
+
+const DEMO_GRADES = {
+  's1':{'L1':9.5,'L2':9.0,'L3':9.5,'part':10},
+  's2':{'L1':8.0,'L2':7.5,'L3':8.0,'part':8},
+  's3':{'L1':6.5,'L2':7.0,'L3':6.0,'part':6},
+  's4':{'L1':9.0,'L2':8.5,'L3':null,'part':9},
+  's5':{'L1':10, 'L2':9.5,'L3':9.0,'part':10},
+  's6':{'L1':7.5,'L2':8.0,'L3':7.5,'part':7},
+};
+
+// ══════════════════════════════════════════════
+//  HELPERS
+// ══════════════════════════════════════════════
+function toast(msg){ const t=document.getElementById('toast'); t.textContent=msg; t.classList.add('show'); setTimeout(()=>t.classList.remove('show'),2500); }
+function initials(n){ return n.split(' ').map(w=>w[0]).slice(0,2).join('').toUpperCase(); }
+function avg(arr){ const v=arr.filter(x=>x!==null&&x!==undefined); return v.length?v.reduce((a,b)=>a+b,0)/v.length:null; }
+function fmtGrade(g){ return g===null||g===undefined?'—':Number(g).toFixed(1); }
+function closeModal(){ document.getElementById('modal').classList.remove('open'); }
+function openModal(title, bodyHTML, footerHTML=''){
+  document.getElementById('modal-title').textContent = title;
+  document.getElementById('modal-body').innerHTML = bodyHTML;
+  document.getElementById('modal-footer').innerHTML = footerHTML + '<button class="btn" onclick="closeModal()">Cerrar</button>';
+  document.getElementById('modal').classList.add('open');
+}
+window.closeModal = closeModal;
+window.openModal = openModal;
+
+const skillColors = {
+  Listening:{bg:'#eff6ff',c:'#1e40af'},
+  Speaking:{bg:'#f0fdf4',c:'#15803d'},
+  Grammar:{bg:'#faf5ff',c:'#7e22ce'},
+  Reading:{bg:'#fefce8',c:'#854d0e'},
+  Writing:{bg:'#fff7ed',c:'#9a3412'},
+};
+
+// ══════════════════════════════════════════════
+//  AUTH
+// ══════════════════════════════════════════════
+window.switchLoginTab = function(role){
+  loginRole = role;
+  document.getElementById('tab-teacher').classList.toggle('active', role==='teacher');
+  document.getElementById('tab-student').classList.toggle('active', role==='student');
+}
+
+window.doLogin = async function(){
+  const email = document.getElementById('login-email').value.trim();
+  const pass  = document.getElementById('login-pass').value;
+  const errEl = document.getElementById('login-error');
+  errEl.style.display='none';
+  document.getElementById('login-btn').textContent='Entrando...';
+
+  if(FIREBASE_READY){
+    try {
+      const cred = await signInWithEmailAndPassword(auth, email, pass);
+      const snap = await getDoc(doc(db,'users', cred.user.uid));
+      if(!snap.exists()){ errEl.textContent='Usuario no encontrado en la base de datos.'; errEl.style.display='block'; await signOut(auth); document.getElementById('login-btn').textContent='Entrar'; return; }
+      const data = snap.data();
+      if(data.role !== loginRole){ errEl.textContent=`Esta cuenta es de ${data.role==='teacher'?'maestro':'alumno'}. Selecciona el rol correcto.`; errEl.style.display='block'; await signOut(auth); document.getElementById('login-btn').textContent='Entrar'; return; }
+      currentUser = { uid:cred.user.uid, email, name:data.name, role:data.role, groupId:data.groupId||null };
+      enterApp();
+    } catch(e){
+      errEl.textContent = e.code==='auth/invalid-credential'?'Correo o contraseña incorrectos.':e.message;
+      errEl.style.display='block';
+    }
+  } else {
+    // Demo mode
+    const u = DEMO_USERS[email];
+    if(u && u.pass===pass && u.role===loginRole){
+      currentUser = { uid:u.uid, email, name:u.name, role:u.role, groupId:u.groupId||null };
+      enterApp();
+    } else {
+      errEl.textContent = 'Correo o contraseña incorrectos.';
+      errEl.style.display='block';
+    }
+  }
+  document.getElementById('login-btn').textContent='Entrar';
+}
+
+window.doLogout = async function(){
+  if(FIREBASE_READY) await signOut(auth);
+  currentUser = null;
+  document.getElementById('app').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+  document.getElementById('login-email').value='';
+  document.getElementById('login-pass').value='';
+}
+
+// ══════════════════════════════════════════════
+//  APP INIT
+// ══════════════════════════════════════════════
+function enterApp(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('app').style.display='flex';
+
+  const av = document.getElementById('nav-avatar');
+  av.textContent = initials(currentUser.name);
+  av.className = 'avatar ' + (currentUser.role==='teacher'?'av-t':'av-s');
+  document.getElementById('nav-name').textContent = currentUser.name;
+  document.getElementById('nav-role').textContent = currentUser.role==='teacher'?'· Maestro':'· Alumno';
+
+  buildSidebar();
+  if(currentUser.role==='teacher') showSection('dashboard');
+  else showSection('my-dashboard');
+}
+
+function buildSidebar(){
+  const sb = document.getElementById('sidebar');
+  if(currentUser.role==='teacher'){
+    sb.innerHTML = `
+      <div style="padding:16px 16px 4px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Panel</div>
+        <div class="nav-item" data-sec="dashboard" onclick="showSection('dashboard',this)">📊 <span>Inicio</span></div>
+      </div>
+      <div class="nav-sec">Gestión</div>
+      <div class="nav-item" data-sec="students" onclick="showSection('students',this)">👥 <span>Estudiantes</span></div>
+      <div class="nav-item" data-sec="attendance" onclick="showSection('attendance',this)">✅ <span>Asistencia</span></div>
+      <div class="nav-item" data-sec="grades" onclick="showSection('grades',this)">📈 <span>Calificaciones</span></div>
+      <div class="nav-sec">Contenido</div>
+      <div class="nav-item" data-sec="lessons" onclick="showSection('lessons',this)">📚 <span>Lecciones</span></div>
+      <div class="nav-item" data-sec="exercises" onclick="showSection('exercises',this)">✏️ <span>Ejercicios</span></div>
+      <div class="nav-sec">Sistema</div>
+      
+    `;
+  } else {
+    sb.innerHTML = `
+      <div style="padding:16px 16px 4px">
+        <div style="font-size:11px;font-weight:600;color:var(--text3);letter-spacing:.08em;text-transform:uppercase;margin-bottom:8px">Mi panel</div>
+        <div class="nav-item" data-sec="my-dashboard" onclick="showSection('my-dashboard',this)">🏠 <span>Inicio</span></div>
+      </div>
+      <div class="nav-sec">Aprendizaje</div>
+      <div class="nav-item" data-sec="my-lessons" onclick="showSection('my-lessons',this)">📚 <span>Mis lecciones</span></div>
+      <div class="nav-item" data-sec="my-exercises" onclick="showSection('my-exercises',this)">✏️ <span>Ejercicios</span></div>
+      <div class="nav-item" data-sec="my-grades" onclick="showSection('my-grades',this)">📊 <span>Mis calificaciones</span></div>
+    `;
+  }
+}
+
+window.showSection = function(sec, el){
+  activeSection = sec;
+  document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));
+  if(el) el.classList.add('active');
+  else { const found = document.querySelector(`.nav-item[data-sec="${sec}"]`); if(found) found.classList.add('active'); }
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = '';
+  const renders = {
+    dashboard: renderDashboard,
+    students: renderStudents,
+    attendance: renderAttendance,
+    grades: renderGrades,
+    lessons: renderLessons,
+    exercises: renderExercises,
+    config: renderConfig,
+    'my-dashboard': renderMyDashboard,
+    'my-lessons': renderMyLessons,
+    'my-exercises': renderMyExercises,
+    'my-grades': renderMyGrades,
+  };
+  if(renders[sec]) renders[sec]();
+}
+
+// ══════════════════════════════════════════════
+//  DATA LAYER (Firebase or demo)
+// ══════════════════════════════════════════════
+async function getStudents(groupId=null){
+  if(FIREBASE_READY){
+    let q = groupId ? query(collection(db,'students'), where('groupId','==',groupId)) : collection(db,'students');
+    const snap = await getDocs(q);
+    return snap.docs.map(d=>({id:d.id,...d.data()}));
+  }
+  return groupId ? DEMO_STUDENTS.filter(s=>s.groupId===groupId) : DEMO_STUDENTS;
+}
+
+async function getGroups(){
+  if(FIREBASE_READY){
+    const snap = await getDocs(collection(db,'groups'));
+    return snap.docs.map(d=>({id:d.id,...d.data()}));
+  }
+  return DEMO_GROUPS;
+}
+
+async function getGrades(studentId){
+  if(FIREBASE_READY){
+    const snap = await getDoc(doc(db,'grades',studentId));
+    return snap.exists()?snap.data():{};
+  }
+  return DEMO_GRADES[studentId]||{};
+}
+
+async function saveGrade(studentId, field, value){
+  if(FIREBASE_READY){
+    await setDoc(doc(db,'grades',studentId), {[field]:value}, {merge:true});
+  } else {
+    if(!DEMO_GRADES[studentId]) DEMO_GRADES[studentId]={};
+    DEMO_GRADES[studentId][field] = value;
+  }
+}
+
+async function saveAttendanceRecord(groupId, date, records){
+  const key = `${groupId}_${date}`;
+  if(FIREBASE_READY){
+    await setDoc(doc(db,'attendance',key), {groupId,date,records,updatedAt:serverTimestamp()});
+  } else {
+    window._demoAttendance = window._demoAttendance||{};
+    window._demoAttendance[key] = {groupId,date,records};
+  }
+}
+
+async function getAttendanceRecord(groupId, date){
+  const key = `${groupId}_${date}`;
+  if(FIREBASE_READY){
+    const snap = await getDoc(doc(db,'attendance',key));
+    return snap.exists()?snap.data().records:{};
+  }
+  return (window._demoAttendance&&window._demoAttendance[key])?window._demoAttendance[key].records:{};
+}
+
+async function addStudentToDB(data){
+  if(FIREBASE_READY){
+    // Create auth user then profile doc
+    const cred = await createUserWithEmailAndPassword(auth, data.email, data.password);
+    await setDoc(doc(db,'users',cred.user.uid), {name:data.name, role:'student', groupId:data.groupId, email:data.email});
+    await setDoc(doc(db,'students',cred.user.uid), {name:data.name, email:data.email, groupId:data.groupId, level:data.level, createdAt:serverTimestamp()});
+    return cred.user.uid;
+  } else {
+    const id = 's'+(DEMO_STUDENTS.length+1);
+    DEMO_STUDENTS.push({id,name:data.name,email:data.email,groupId:data.groupId,level:data.level});
+    return id;
+  }
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: DASHBOARD
+// ══════════════════════════════════════════════
+async function renderDashboard(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `
+    <div class="page-header"><div><div class="page-title">Panel del maestro</div><div class="page-sub">${today()}</div></div></div>
+    <div class="grid-4">
+      <div class="stat-card"><div class="stat-label">Alumnos activos</div><div class="stat-value" id="d-total">—</div></div>
+      <div class="stat-card"><div class="stat-label">Asistencia hoy</div><div class="stat-value" id="d-att">—</div></div>
+      <div class="stat-card"><div class="stat-label">Grupos</div><div class="stat-value" id="d-groups">—</div></div>
+      <div class="stat-card"><div class="stat-label">Promedio general</div><div class="stat-value" id="d-avg">—</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card"><div style="font-size:15px;font-weight:500;margin-bottom:12px">Mis grupos</div><div id="d-groups-list"></div></div>
+      <div class="card"><div style="font-size:15px;font-weight:500;margin-bottom:12px">Accesos rápidos</div>
+        <div style="display:flex;flex-direction:column;gap:8px">
+          <button class="btn" style="text-align:left" onclick="showSection('attendance')">✅ Tomar asistencia ahora</button>
+          <button class="btn" style="text-align:left" onclick="showSection('grades')">📈 Ver calificaciones</button>
+          <button class="btn" style="text-align:left" onclick="showSection('students')">👥 Gestionar alumnos</button>
+          <button class="btn" style="text-align:left" onclick="showSection('exercises')">✏️ Ejercicios interactivos</button>
+        </div>
+      </div>
+    </div>`;
+
+  const [students, groups] = await Promise.all([getStudents(), getGroups()]);
+  document.getElementById('d-total').textContent = students.length;
+  document.getElementById('d-groups').textContent = groups.length;
+
+  // Quick attendance count
+  const todayKey = dateKey();
+  let present=0;
+  for(const g of groups){
+    const recs = await getAttendanceRecord(g.id, todayKey);
+    present += Object.values(recs).filter(v=>v==='P').length;
+  }
+  const attPct = students.length ? Math.round(present/students.length*100) : 0;
+  document.getElementById('d-att').textContent = present ? attPct+'%' : '—';
+
+  // Grades avg
+  let allAvgs=[];
+  for(const s of students){
+    const g = await getGrades(s.id);
+    const nums = Object.values(g).filter(v=>v!==null&&typeof v==='number');
+    if(nums.length) allAvgs.push(nums.reduce((a,b)=>a+b,0)/nums.length);
+  }
+  document.getElementById('d-avg').textContent = allAvgs.length ? (allAvgs.reduce((a,b)=>a+b,0)/allAvgs.length).toFixed(1) : '—';
+
+  const gl = document.getElementById('d-groups-list');
+  gl.innerHTML = groups.map(g=>{
+    const cnt = students.filter(s=>s.groupId===g.id).length;
+    return `<div style="display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--border)">
+      <div><div style="font-size:14px;font-weight:500">${g.name}</div><div style="font-size:12px;color:var(--text2)">${g.level} · ${g.schedule}</div></div>
+      <div style="display:flex;align-items:center;gap:8px"><span class="badge bb">${cnt} alumnos</span><button class="btn btn-sm" onclick="showSection('attendance')">Asistencia</button></div>
+    </div>`;
+  }).join('');
+}
+
+function today(){ return new Date().toLocaleDateString('es-MX',{weekday:'long',year:'numeric',month:'long',day:'numeric'}); }
+function dateKey(){ return new Date().toISOString().slice(0,10); }
+
+// ══════════════════════════════════════════════
+//  TEACHER: STUDENTS
+// ══════════════════════════════════════════════
+async function renderStudents(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `<div class="page-header">
+    <div><div class="page-title">Estudiantes</div><div class="page-sub">Gestión de alumnos inscritos</div></div>
+    <button class="btn btn-primary" onclick="openAddStudentModal()">+ Agregar alumno</button>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>#</th><th>Nombre</th><th>Correo</th><th>Grupo</th><th>Nivel</th><th>Acciones</th></tr></thead>
+    <tbody id="students-tbody"><tr><td colspan="6" style="text-align:center;color:var(--text2);padding:24px">Cargando...</td></tr></tbody>
+  </table></div>`;
+
+  const [students, groups] = await Promise.all([getStudents(), getGroups()]);
+  const tbody = document.getElementById('students-tbody');
+  if(!students.length){ tbody.innerHTML='<tr><td colspan="6" style="text-align:center;color:var(--text2);padding:24px">Sin alumnos registrados</td></tr>'; return; }
+  tbody.innerHTML = students.map((s,i)=>{
+    const g = groups.find(x=>x.id===s.groupId);
+    return `<tr>
+      <td style="color:var(--text2)">${i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar av-s" style="width:28px;height:28px;font-size:10px">${initials(s.name)}</div><strong>${s.name}</strong></div></td>
+      <td style="color:var(--text2)">${s.email}</td>
+      <td>${g?g.name:'—'}</td>
+      <td><span class="badge bb">${s.level||'—'}</span></td>
+      <td><button class="btn btn-sm" onclick="openStudentDetail('${s.id}')">Ver detalle</button></td>
+    </tr>`;
+  }).join('');
+}
+
+window.openAddStudentModal = async function(){
+  const groups = await getGroups();
+  const gOpts = groups.map(g=>`<option value="${g.id}">${g.name} — ${g.level}</option>`).join('');
+  openModal('Agregar estudiante',
+    `<div class="ig"><label>Nombre completo</label><input id="ns-name" type="text" placeholder="Juan García"/></div>
+     <div class="ig"><label>Correo electrónico</label><input id="ns-email" type="email" placeholder="alumno@escuela.com"/></div>
+     <div class="ig"><label>Contraseña inicial</label><input id="ns-pass" type="password" placeholder="Mínimo 6 caracteres"/></div>
+     <div class="ig"><label>Grupo</label><select id="ns-group">${gOpts}</select></div>
+     <div class="ig"><label>Nivel</label><select id="ns-level"><option>A1</option><option>A2</option><option>B1</option><option>B2</option><option>C1</option></select></div>`,
+    `<button class="btn btn-primary" onclick="submitAddStudent()">Guardar alumno</button>`
+  );
+}
+
+window.submitAddStudent = async function(){
+  const name=document.getElementById('ns-name').value.trim();
+  const email=document.getElementById('ns-email').value.trim();
+  const pass=document.getElementById('ns-pass').value;
+  const groupId=document.getElementById('ns-group').value;
+  const level=document.getElementById('ns-level').value;
+  if(!name||!email){ toast('⚠ Completa nombre y correo'); return; }
+  if(FIREBASE_READY && pass.length<6){ toast('⚠ Contraseña mínimo 6 caracteres'); return; }
+  try {
+    await addStudentToDB({name,email,password:pass||'demo1234',groupId,level});
+    closeModal(); toast('✓ Alumno registrado'); renderStudents();
+  } catch(e){ toast('Error: '+e.message); }
+}
+
+window.openStudentDetail = async function(id){
+  const students = await getStudents();
+  const s = students.find(x=>x.id===id);
+  if(!s) return;
+  const grades = await getGrades(id);
+  const nums = Object.values(grades).filter(v=>v!==null&&typeof v==='number');
+  const prom = nums.length?(nums.reduce((a,b)=>a+b,0)/nums.length).toFixed(1):'—';
+  openModal(`Detalle: ${s.name}`,
+    `<div style="display:flex;align-items:center;gap:12px;margin-bottom:16px">
+       <div class="avatar av-s" style="width:44px;height:44px;font-size:16px">${initials(s.name)}</div>
+       <div><div style="font-size:15px;font-weight:500">${s.name}</div><div style="font-size:13px;color:var(--text2)">${s.email}</div></div>
+       <div style="margin-left:auto;text-align:right"><div style="font-size:22px;font-family:'DM Serif Display',serif">${prom}</div><div style="font-size:12px;color:var(--text2)">Promedio</div></div>
+     </div>
+     <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:13px">
+       <div><span style="color:var(--text2)">Nivel:</span> <strong>${s.level}</strong></div>
+       <div><span style="color:var(--text2)">Grupo:</span> <strong>${s.groupId}</strong></div>
+     </div>`
+  );
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: ATTENDANCE
+// ══════════════════════════════════════════════
+let attState = {};
+async function renderAttendance(){
+  const groups = await getGroups();
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `<div class="page-header">
+    <div><div class="page-title">Lista de asistencia</div><div class="page-sub">${today()}</div></div>
+    <div style="display:flex;gap:8px">
+      <select id="att-group-sel" onchange="loadAttendance()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text)">
+        ${groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('')}
+      </select>
+      <button class="btn" onclick="markAllAtt('P')">✓ Todos presentes</button>
+      <button class="btn btn-primary" onclick="saveAtt()">💾 Guardar</button>
+    </div>
+  </div>
+  <div class="card" style="margin-bottom:14px">
+    <div style="display:flex;gap:2rem;font-size:14px">
+      <span>Presentes: <strong id="cnt-p" style="color:var(--green)">0</strong></span>
+      <span>Ausentes: <strong id="cnt-a" style="color:var(--red)">0</strong></span>
+      <span>Tardanzas: <strong id="cnt-t" style="color:var(--amber)">0</strong></span>
+    </div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th style="width:32px">#</th><th>Estudiante</th><th style="width:60px">Presente</th><th style="width:60px">Ausente</th><th style="width:60px">Tardanza</th><th>Observación</th></tr></thead>
+    <tbody id="att-tbody"></tbody>
+  </table></div>`;
+
+  await loadAttendance();
+}
+
+window.loadAttendance = async function(){
+  const groupId = document.getElementById('att-group-sel')?.value;
+  if(!groupId) return;
+  const students = await getStudents(groupId);
+  const saved = await getAttendanceRecord(groupId, dateKey());
+  attState = {};
+  students.forEach(s=>{ attState[s.id] = saved[s.id]||'none'; });
+  renderAttTable(students);
+}
+
+function renderAttTable(students){
+  const tbody = document.getElementById('att-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = students.map((s,i)=>{
+    const st = attState[s.id]||'none';
+    return `<tr id="att-row-${s.id}">
+      <td style="color:var(--text2)">${i+1}</td>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar av-s" style="width:26px;height:26px;font-size:9px">${initials(s.name)}</div>${s.name}</div></td>
+      <td><button class="att-btn ${st==='P'?'att-p':''}" onclick="toggleAtt('${s.id}','P')" title="Presente">✓</button></td>
+      <td><button class="att-btn ${st==='A'?'att-a':''}" onclick="toggleAtt('${s.id}','A')" title="Ausente">✗</button></td>
+      <td><button class="att-btn ${st==='T'?'att-t':''}" onclick="toggleAtt('${s.id}','T')" title="Tardanza">~</button></td>
+      <td><input type="text" placeholder="Nota..." style="width:160px;padding:4px 8px;border:1px solid var(--border);border-radius:6px;font-size:12px;background:var(--surface);color:var(--text)"/></td>
+    </tr>`;
+  }).join('');
+  updateAttCounts();
+}
+
+window.toggleAtt = function(id, status){
+  attState[id] = attState[id]===status?'none':status;
+  const row = document.getElementById('att-row-'+id);
+  if(row){
+    const btns = row.querySelectorAll('.att-btn');
+    btns[0].className='att-btn'+(attState[id]==='P'?' att-p':'');
+    btns[1].className='att-btn'+(attState[id]==='A'?' att-a':'');
+    btns[2].className='att-btn'+(attState[id]==='T'?' att-t':'');
+  }
+  updateAttCounts();
+}
+
+function updateAttCounts(){
+  const vals = Object.values(attState);
+  document.getElementById('cnt-p').textContent = vals.filter(v=>v==='P').length;
+  document.getElementById('cnt-a').textContent = vals.filter(v=>v==='A').length;
+  document.getElementById('cnt-t').textContent = vals.filter(v=>v==='T').length;
+}
+
+window.markAllAtt = async function(status){
+  Object.keys(attState).forEach(k=>{ attState[k]=status; });
+  const groupId = document.getElementById('att-group-sel')?.value;
+  const students = await getStudents(groupId);
+  renderAttTable(students);
+}
+
+window.saveAtt = async function(){
+  const groupId = document.getElementById('att-group-sel')?.value;
+  if(!groupId) return;
+  await saveAttendanceRecord(groupId, dateKey(), attState);
+  toast('✓ Asistencia guardada correctamente');
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: GRADES
+// ══════════════════════════════════════════════
+async function renderGrades(){
+  const mc = document.getElementById('main-content');
+  const groups = await getGroups();
+  mc.innerHTML = `<div class="page-header">
+    <div><div class="page-title">Calificaciones</div></div>
+    <div style="display:flex;gap:8px">
+      <select id="gr-group-sel" onchange="loadGrades()" style="padding:7px 12px;border:1.5px solid var(--border);border-radius:8px;font-size:13px;background:var(--surface);color:var(--text)">
+        ${groups.map(g=>`<option value="${g.id}">${g.name}</option>`).join('')}
+      </select>
+      <button class="btn btn-primary" onclick="saveAllGrades()">💾 Guardar cambios</button>
+    </div>
+  </div>
+  <div class="table-wrap"><table>
+    <thead><tr><th>Estudiante</th><th>Unidad 1</th><th>Unidad 2</th><th>Unidad 3</th><th>Participación</th><th>Promedio</th><th>Estado</th></tr></thead>
+    <tbody id="gr-tbody"><tr><td colspan="7" style="text-align:center;padding:24px;color:var(--text2)">Cargando...</td></tr></tbody>
+  </table></div>`;
+  await loadGrades();
+}
+
+window.loadGrades = async function(){
+  const groupId = document.getElementById('gr-group-sel')?.value;
+  if(!groupId) return;
+  const students = await getStudents(groupId);
+  const allGrades = {};
+  for(const s of students){ allGrades[s.id] = await getGrades(s.id); }
+  const tbody = document.getElementById('gr-tbody');
+  if(!tbody) return;
+  tbody.innerHTML = students.map(s=>{
+    const g = allGrades[s.id]||{};
+    const vals = [g.L1,g.L2,g.L3,g.part].filter(v=>v!==null&&v!==undefined);
+    const prom = vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):null;
+    const badge = prom>=9?'bg':prom>=7?'bb':prom>=6?'ba':'br';
+    const label = prom>=9?'Excelente':prom>=7?'Bueno':prom>=6?'Regular':prom?'Bajo':'Sin datos';
+    return `<tr>
+      <td><div style="display:flex;align-items:center;gap:8px"><div class="avatar av-s" style="width:24px;height:24px;font-size:9px">${initials(s.name)}</div>${s.name}</div></td>
+      <td><input class="grade-in" id="g-${s.id}-L1" value="${g.L1??''}" onchange="pendingGrade('${s.id}','L1',this.value)" placeholder="—"/></td>
+      <td><input class="grade-in" id="g-${s.id}-L2" value="${g.L2??''}" onchange="pendingGrade('${s.id}','L2',this.value)" placeholder="—"/></td>
+      <td><input class="grade-in" id="g-${s.id}-L3" value="${g.L3??''}" onchange="pendingGrade('${s.id}','L3',this.value)" placeholder="—"/></td>
+      <td><input class="grade-in" id="g-${s.id}-part" value="${g.part??''}" onchange="pendingGrade('${s.id}','part',this.value)" placeholder="—"/></td>
+      <td><strong id="prom-${s.id}">${prom??'—'}</strong></td>
+      <td><span class="badge ${badge}">${label}</span></td>
+    </tr>`;
+  }).join('');
+}
+
+const pendingGrades = {};
+window.pendingGrade = function(sid, field, val){
+  if(!pendingGrades[sid]) pendingGrades[sid]={};
+  pendingGrades[sid][field] = val===''?null:parseFloat(val);
+  // Recalc avg
+  const fields=['L1','L2','L3','part'];
+  const vals = fields.map(f=>{
+    const el = document.getElementById(`g-${sid}-${f}`);
+    const v = el?parseFloat(el.value):null;
+    return isNaN(v)?null:v;
+  }).filter(v=>v!==null);
+  const pr = document.getElementById('prom-'+sid);
+  if(pr) pr.textContent = vals.length?(vals.reduce((a,b)=>a+b,0)/vals.length).toFixed(1):'—';
+}
+
+window.saveAllGrades = async function(){
+  for(const [sid,fields] of Object.entries(pendingGrades)){
+    for(const [field,value] of Object.entries(fields)){
+      await saveGrade(sid, field, value);
+    }
+  }
+  Object.keys(pendingGrades).forEach(k=>delete pendingGrades[k]);
+  toast('✓ Calificaciones guardadas');
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: LESSONS
+// ══════════════════════════════════════════════
+function renderLessons(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `<div class="page-header">
+    <div><div class="page-title">Lecciones del curso</div><div class="page-sub">Unit 3: Everyday Life — Nivel B1</div></div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap" id="skill-chips">
+      <button class="btn btn-sm btn-primary" onclick="filterLessons(null,this)">Todas</button>
+      <button class="btn btn-sm" onclick="filterLessons('Listening',this)">Listening</button>
+      <button class="btn btn-sm" onclick="filterLessons('Speaking',this)">Speaking</button>
+      <button class="btn btn-sm" onclick="filterLessons('Reading',this)">Reading</button>
+      <button class="btn btn-sm" onclick="filterLessons('Writing',this)">Writing</button>
+      <button class="btn btn-sm" onclick="filterLessons('Grammar',this)">Grammar</button>
+    </div>
+  </div>
+  <div class="grid-3" id="lessons-grid"></div>`;
+  filterLessons(null);
+}
+
+window.filterLessons = function(skill, el){
+  if(el){ document.querySelectorAll('#skill-chips .btn').forEach(b=>{ b.classList.remove('btn-primary'); }); el.classList.add('btn-primary'); }
+  const grid = document.getElementById('lessons-grid');
+  if(!grid) return;
+  const list = skill ? DEMO_LESSONS.filter(l=>l.skill===skill) : DEMO_LESSONS;
+  grid.innerHTML = list.map((l,i)=>{
+    const sc = skillColors[l.skill]||{bg:'#f5f5f4',c:'#78716c'};
+    return `<div class="lesson-card ${(!l.done&&i>2)?'locked':''}">
+      <span class="skill-chip" style="background:${sc.bg};color:${sc.c}">${l.skill}</span>
+      <div style="font-size:15px;font-weight:500;margin-bottom:4px">${l.title}</div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:12px">${l.desc}</div>
+      <div style="display:flex;align-items:center;justify-content:space-between">
+        <span style="font-size:12px;color:${l.done?'var(--green)':'var(--text3)'}">
+          ${l.done?'✓ Completada':'🔒 Pendiente'}
+        </span>
+        <button class="btn btn-sm" onclick="showSection('exercises')">${l.done?'Repasar':'Abrir'}</button>
+      </div>
+    </div>`;
+  }).join('');
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: EXERCISES
+// ══════════════════════════════════════════════
+let activeExIdx = 0;
+const exAnswers = {};
+
+function renderExercises(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `<div class="page-header"><div class="page-title">Ejercicios interactivos</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="ex-tabs"></div>
+  <div id="ex-body"></div>`;
+  buildExTabs();
+  renderExBody();
+}
+
+function buildExTabs(){
+  const tabs = document.getElementById('ex-tabs');
+  if(!tabs) return;
+  tabs.innerHTML = DEMO_EXERCISES.map((e,i)=>
+    `<button class="ex-tab ${i===activeExIdx?'active':''}" onclick="switchEx(${i})">${e.title}</button>`
+  ).join('');
+}
+
+window.switchEx = function(i){ activeExIdx=i; buildExTabs(); renderExBody(); }
+
+function renderExBody(){
+  const ex = DEMO_EXERCISES[activeExIdx];
+  const body = document.getElementById('ex-body');
+  if(!body) return;
+  body.innerHTML = ex.questions.map((q,qi)=>{
+    const ans = exAnswers[`${activeExIdx}-${qi}`];
+    const done = ans !== undefined;
+    return `<div class="ex-box">
+      <div class="ex-q">${qi+1}. ${q.q}</div>
+      ${q.opts.map((o,oi)=>{
+        let cls = 'ex-opt';
+        if(done){ cls+= oi===q.ans?' correct': oi===ans?' wrong':''; cls+=' disabled'; }
+        return `<div class="${cls}" onclick="${done?'':'selectExAns('+activeExIdx+','+qi+','+oi+','+q.ans+')'}"><span style="color:var(--text2);margin-right:6px">${String.fromCharCode(65+oi)}.</span> ${o}</div>`;
+      }).join('')}
+    </div>`;
+  }).join('') +
+  `<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+    <button class="btn" onclick="resetEx()">🔄 Reintentar</button>
+    <button class="btn btn-primary" onclick="submitEx()">Entregar ejercicio</button>
+  </div>`;
+}
+
+window.selectExAns = function(setIdx, qi, sel, correct){
+  exAnswers[`${setIdx}-${qi}`] = sel;
+  renderExBody();
+}
+
+window.resetEx = function(){
+  DEMO_EXERCISES[activeExIdx].questions.forEach((_,qi)=>delete exAnswers[`${activeExIdx}-${qi}`]);
+  renderExBody();
+}
+
+window.submitEx = function(){
+  const ex = DEMO_EXERCISES[activeExIdx];
+  const total = ex.questions.length;
+  const correct = ex.questions.filter((_,qi)=>exAnswers[`${activeExIdx}-${qi}`]===ex.questions[qi].ans).length;
+  toast(`✓ Enviado: ${correct}/${total} correctas (${Math.round(correct/total*10*10)/10}/10)`);
+}
+
+// ══════════════════════════════════════════════
+//  TEACHER: CONFIG
+// ══════════════════════════════════════════════
+function renderConfig(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `<div class="page-header"><div class="page-title">Configuración</div></div>
+
+  <div class="config-section">
+    <div class="config-title">Estado de Firebase</div>
+    <div class="config-desc">La plataforma ${FIREBASE_READY?'está conectada a Firebase y guarda datos reales.':'está en modo demo. Conecta Firebase para guardar datos reales en la nube.'}</div>
+    <div class="config-connected ${FIREBASE_READY?'show':''}">
+      ✓ Firebase conectado — Proyecto: ${FIREBASE_READY?FIREBASE_CONFIG.projectId:'—'}
+    </div>
+    ${!FIREBASE_READY?`<div style="background:var(--amber-bg);border:1px solid #fcd34d;border-radius:var(--radius);padding:14px;font-size:13px;color:var(--amber)">
+      ⚠ Modo demo activo. Los datos no se guardan entre sesiones.
+    </div>`:''}
+  </div>
+
+  <div class="config-section">
+    <div class="config-title">Cómo conectar Firebase (gratuito para siempre)</div>
+    <div class="config-desc">Sigue estos pasos exactos. No necesitas saber programar.</div>
+    <div class="firebase-steps">
+      <strong>Paso 1 — Crear proyecto:</strong><br>
+      Ve a <a href="https://console.firebase.google.com" target="_blank" style="color:#0284c7">console.firebase.google.com</a> e inicia con tu cuenta Google.<br>
+      Clic en "Crear proyecto" → ponle un nombre (ej. <code>mi-escuela-ingles</code>) → continuar.<br><br>
+
+      <strong>Paso 2 — Activar Authentication:</strong><br>
+      En el menú izquierdo → <code>Authentication</code> → "Comenzar" → habilita <code>Correo/contraseña</code>.<br><br>
+
+      <strong>Paso 3 — Activar Firestore:</strong><br>
+      Menú izquierdo → <code>Firestore Database</code> → "Crear base de datos" → elige <code>Modo de prueba</code> → tu región → Hecho.<br><br>
+
+      <strong>Paso 4 — Obtener tus claves:</strong><br>
+      Clic en ⚙️ (rueda dentada) → "Configuración del proyecto" → pestaña "General" → sección "Tus apps".<br>
+      Si no hay app, clic en "&lt;/&gt;" para agregar app Web → ponle un nombre → Registrar app.<br>
+      Copia los valores de <code>firebaseConfig</code> que aparecen.<br><br>
+
+      <strong>Paso 5 — Pegar en esta plataforma:</strong><br>
+      Abre el archivo <code>escuela-ingles.html</code> con el Bloc de notas.<br>
+      Busca el texto <code>TU_API_KEY</code> y reemplaza cada valor con los que copiaste.<br>
+      Guarda el archivo y ábrelo en el navegador. ¡Listo!<br><br>
+
+      <strong>Paso 6 — Reglas de seguridad (opcional pero recomendado):</strong><br>
+      En Firestore → pestaña "Reglas" → copia y pega las reglas del botón de abajo.
+    </div>
+    <button class="btn" style="margin-top:12px" onclick="showFirebaseRules()">Ver reglas de seguridad</button>
+  </div>
+
+  <div class="config-section">
+    <div class="config-title">Registrar primer maestro</div>
+    <div class="config-desc">Después de conectar Firebase, usa esto para crear tu cuenta de maestro.</div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:12px">
+      <div class="ig"><label>Nombre</label><input id="reg-name" type="text" placeholder="Prof. García"/></div>
+      <div class="ig"><label>Correo</label><input id="reg-email" type="email" placeholder="maestro@escuela.com"/></div>
+      <div class="ig"><label>Contraseña</label><input id="reg-pass" type="password" placeholder="Mínimo 6 caracteres"/></div>
+    </div>
+    <button class="btn btn-primary" onclick="registerTeacher()">Registrar maestro</button>
+  </div>
+
+  <div class="config-section">
+    <div class="config-title">Nombre de la escuela</div>
+    <div class="ig" style="max-width:360px"><label>Nombre</label><input type="text" id="school-name" placeholder="Escuela de Inglés Durango" value="${localStorage.getItem('schoolName')||''}"/></div>
+    <button class="btn btn-primary" onclick="saveSchoolName()">Guardar</button>
+  </div>`;
+}
+
+window.saveSchoolName = function(){
+  const name = document.getElementById('school-name')?.value;
+  if(name){ localStorage.setItem('schoolName',name); toast('✓ Guardado'); }
+}
+
+window.showFirebaseRules = function(){
+  openModal('Reglas de seguridad Firestore',
+    `<pre style="font-size:11px;background:var(--surface2);padding:12px;border-radius:8px;overflow:auto;line-height:1.6">rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+    match /users/{userId} {
+      allow read, write: if request.auth.uid == userId;
+    }
+    match /students/{sid} {
+      allow read: if request.auth != null;
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+    match /grades/{sid} {
+      allow read: if request.auth != null;
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+    match /attendance/{doc} {
+      allow read: if request.auth != null;
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+    match /groups/{gid} {
+      allow read: if request.auth != null;
+      allow write: if get(/databases/$(database)/documents/users/$(request.auth.uid)).data.role == 'teacher';
+    }
+  }
+}</pre>`,
+    ''
+  );
+}
+
+window.registerTeacher = async function(){
+  const name = document.getElementById('reg-name')?.value.trim();
+  const email = document.getElementById('reg-email')?.value.trim();
+  const pass = document.getElementById('reg-pass')?.value;
+  if(!FIREBASE_READY){ toast('⚠ Primero configura Firebase'); return; }
+  if(!name||!email||pass.length<6){ toast('⚠ Completa todos los campos (contraseña mín. 6 chars)'); return; }
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await setDoc(doc(db,'users',cred.user.uid), {name, role:'teacher', email, createdAt:serverTimestamp()});
+    toast('✓ Maestro registrado: '+email);
+  } catch(e){ toast('Error: '+e.message); }
+}
+
+// ══════════════════════════════════════════════
+//  STUDENT VIEWS
+// ══════════════════════════════════════════════
+async function renderMyDashboard(){
+  const mc = document.getElementById('main-content');
+  const studentList = await getStudents();
+  const s = studentList.find(x=>x.id===currentUser.uid)||{name:currentUser.name,groupId:currentUser.groupId,level:'B1'};
+  const grades = await getGrades(currentUser.uid);
+  const nums = Object.values(grades).filter(v=>v!==null&&typeof v==='number');
+  const prom = nums.length?(nums.reduce((a,b)=>a+b,0)/nums.length).toFixed(1):'—';
+  const schoolName = localStorage.getItem('schoolName')||'EduEnglish';
+  mc.innerHTML = `
+    <div class="page-header"><div><div class="page-title">Hola, ${currentUser.name.split(' ')[0]} 👋</div><div class="page-sub">${today()}</div></div></div>
+    <div class="grid-4">
+      <div class="stat-card"><div class="stat-label">Mi promedio</div><div class="stat-value">${prom}</div></div>
+      <div class="stat-card"><div class="stat-label">Nivel</div><div class="stat-value">${s.level||'B1'}</div></div>
+      <div class="stat-card"><div class="stat-label">Grupo</div><div class="stat-value">${s.groupId||'—'}</div></div>
+      <div class="stat-card"><div class="stat-label">Lecciones</div><div class="stat-value">${DEMO_LESSONS.filter(l=>l.done).length}/${DEMO_LESSONS.length}</div></div>
+    </div>
+    <div class="grid-2">
+      <div class="card">
+        <div style="font-size:15px;font-weight:500;margin-bottom:14px">Mi progreso por habilidad</div>
+        <div class="skill-row"><span class="skill-lbl">Listening</span><div class="prog-bar" style="flex:1"><div class="prog-fill" style="width:82%;background:#3b82f6"></div></div><span style="font-size:12px;color:var(--text2);width:32px">82%</span></div>
+        <div class="skill-row"><span class="skill-lbl">Speaking</span><div class="prog-bar" style="flex:1"><div class="prog-fill" style="width:70%;background:#22c55e"></div></div><span style="font-size:12px;color:var(--text2);width:32px">70%</span></div>
+        <div class="skill-row"><span class="skill-lbl">Reading</span><div class="prog-bar" style="flex:1"><div class="prog-fill" style="width:88%;background:#84cc16"></div></div><span style="font-size:12px;color:var(--text2);width:32px">88%</span></div>
+        <div class="skill-row"><span class="skill-lbl">Writing</span><div class="prog-bar" style="flex:1"><div class="prog-fill" style="width:65%;background:#f59e0b"></div></div><span style="font-size:12px;color:var(--text2);width:32px">65%</span></div>
+        <div class="skill-row"><span class="skill-lbl">Grammar</span><div class="prog-bar" style="flex:1"><div class="prog-fill" style="width:75%;background:#8b5cf6"></div></div><span style="font-size:12px;color:var(--text2);width:32px">75%</span></div>
+      </div>
+      <div class="card">
+        <div style="font-size:15px;font-weight:500;margin-bottom:12px">Próximas lecciones</div>
+        ${DEMO_LESSONS.filter(l=>!l.done).slice(0,3).map(l=>{
+          const sc=skillColors[l.skill]||{bg:'#f5f5f4',c:'#78716c'};
+          return `<div style="display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--border)">
+            <span class="skill-chip" style="background:${sc.bg};color:${sc.c};font-size:10px">${l.skill}</span>
+            <span style="font-size:13px;flex:1">${l.title}</span>
+            <button class="btn btn-sm btn-primary" onclick="showSection('my-exercises')">Ir</button>
+          </div>`;
+        }).join('')}
+        <button class="btn" style="width:100%;margin-top:12px;text-align:center" onclick="showSection('my-lessons')">Ver todas las lecciones</button>
+      </div>
+    </div>`;
+}
+
+function renderMyLessons(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `<div class="page-header"><div class="page-title">Mis lecciones</div><div class="page-sub">Unit 3: Everyday Life</div></div>
+  <div class="grid-3">
+    ${DEMO_LESSONS.map((l,i)=>{
+      const sc=skillColors[l.skill]||{bg:'#f5f5f4',c:'#78716c'};
+      return `<div class="lesson-card ${(!l.done&&i>2)?'locked':''}">
+        <span class="skill-chip" style="background:${sc.bg};color:${sc.c}">${l.skill}</span>
+        <div style="font-size:15px;font-weight:500;margin-bottom:4px">${l.title}</div>
+        <div style="font-size:12px;color:var(--text2);margin-bottom:12px">${l.desc}</div>
+        <div style="display:flex;align-items:center;justify-content:space-between">
+          <span style="font-size:12px;color:${l.done?'var(--green)':'var(--text3)'}">
+            ${l.done?'✓ Completada':'Pendiente'}
+          </span>
+          <button class="btn btn-sm ${l.done||i<=2?'btn-primary':''}" onclick="${l.done||i<=2?`showSection('my-exercises')`:'void(0)'}">
+            ${l.done?'Repasar':'Abrir'}
+          </button>
+        </div>
+      </div>`;
+    }).join('')}
+  </div>`;
+}
+
+function renderMyExercises(){
+  const mc = document.getElementById('main-content');
+  mc.innerHTML = `<div class="page-header"><div class="page-title">Ejercicios</div></div>
+  <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:20px" id="ex-tabs-s"></div>
+  <div id="ex-body-s"></div>`;
+  buildExTabsStudent();
+  renderExBodyStudent();
+}
+
+function buildExTabsStudent(){
+  const tabs = document.getElementById('ex-tabs-s');
+  if(!tabs) return;
+  tabs.innerHTML = DEMO_EXERCISES.map((e,i)=>
+    `<button class="ex-tab ${i===activeExIdx?'active':''}" onclick="switchExS(${i})">${e.title}</button>`
+  ).join('');
+}
+
+window.switchExS = function(i){ activeExIdx=i; buildExTabsStudent(); renderExBodyStudent(); }
+
+function renderExBodyStudent(){
+  const ex = DEMO_EXERCISES[activeExIdx];
+  const body = document.getElementById('ex-body-s');
+  if(!body) return;
+  body.innerHTML = ex.questions.map((q,qi)=>{
+    const ans = exAnswers[`${activeExIdx}-${qi}`];
+    const done = ans !== undefined;
+    return `<div class="ex-box">
+      <div class="ex-q">${qi+1}. ${q.q}</div>
+      ${q.opts.map((o,oi)=>{
+        let cls='ex-opt';
+        if(done){ cls+=oi===q.ans?' correct':oi===ans?' wrong':''; cls+=' disabled'; }
+        return `<div class="${cls}" onclick="${done?'':'sSelectAns('+activeExIdx+','+qi+','+oi+','+q.ans+')'}"><span style="color:var(--text2);margin-right:6px">${String.fromCharCode(65+oi)}.</span> ${o}</div>`;
+      }).join('')}
+    </div>`;
+  }).join('')+
+  `<div style="display:flex;gap:8px;justify-content:flex-end;margin-top:12px">
+    <button class="btn" onclick="sResetEx()">🔄 Reintentar</button>
+    <button class="btn btn-primary" onclick="sSubmitEx()">Entregar</button>
+  </div>`;
+}
+
+window.sSelectAns = function(setIdx,qi,sel,correct){
+  exAnswers[`${setIdx}-${qi}`]=sel; renderExBodyStudent();
+}
+window.sResetEx = function(){
+  DEMO_EXERCISES[activeExIdx].questions.forEach((_,qi)=>delete exAnswers[`${activeExIdx}-${qi}`]);
+  renderExBodyStudent();
+}
+window.sSubmitEx = function(){
+  const ex=DEMO_EXERCISES[activeExIdx];
+  const total=ex.questions.length;
+  const correct=ex.questions.filter((_,qi)=>exAnswers[`${activeExIdx}-${qi}`]===ex.questions[qi].ans).length;
+  toast(`✓ Enviado: ${correct}/${total} — ${Math.round(correct/total*10*10)/10}/10`);
+}
+
+async function renderMyGrades(){
+  const mc = document.getElementById('main-content');
+  const grades = await getGrades(currentUser.uid);
+  const entries = [
+    {label:'Unidad 1 — Daily Routines',   key:'L1'},
+    {label:'Unidad 2 — Describing People', key:'L2'},
+    {label:'Unidad 3 — Present Perfect',   key:'L3'},
+    {label:'Participación',                 key:'part'},
+  ];
+  const nums = entries.map(e=>grades[e.key]).filter(v=>v!==null&&v!==undefined);
+  const prom = nums.length?(nums.reduce((a,b)=>a+b,0)/nums.length).toFixed(1):'—';
+  mc.innerHTML = `<div class="page-header"><div class="page-title">Mis calificaciones</div></div>
+  <div class="grid-2">
+    <div class="card">
+      <div style="font-size:15px;font-weight:500;margin-bottom:16px">Desglose de notas</div>
+      ${entries.map(e=>{
+        const g=grades[e.key];
+        const pct=g?Math.round(g*10)+'%':'0%';
+        const c=g>=9?'#22c55e':g>=7?'#3b82f6':g>=6?'#f59e0b':'#ef4444';
+        return `<div style="margin-bottom:14px">
+          <div style="display:flex;justify-content:space-between;font-size:13px;margin-bottom:5px">
+            <span>${e.label}</span>
+            <strong style="color:${c}">${g??'—'}</strong>
+          </div>
+          <div class="prog-bar"><div class="prog-fill" style="width:${pct};background:${c}"></div></div>
+        </div>`;
+      }).join('')}
+    </div>
+    <div class="card" style="display:flex;flex-direction:column;align-items:center;justify-content:center">
+      <div style="font-size:72px;font-family:'DM Serif Display',serif;color:${parseFloat(prom)>=7?'var(--accent)':'var(--red)'}">${prom}</div>
+      <div style="font-size:15px;color:var(--text2);margin-top:4px">Promedio general</div>
+      <div class="badge ${parseFloat(prom)>=9?'bg':parseFloat(prom)>=7?'bb':parseFloat(prom)>=6?'ba':'br'}" style="margin-top:12px;font-size:13px;padding:5px 14px">
+        ${parseFloat(prom)>=9?'Excelente':parseFloat(prom)>=7?'Buen desempeño':parseFloat(prom)>=6?'Regular':'Necesita mejorar'}
+      </div>
+    </div>
+  </div>`;
+}
+
+// ══════════════════════════════════════════════
+//  BOOT
+// ══════════════════════════════════════════════
+setTimeout(()=>{
+  document.getElementById('loader').style.display='none';
+  if(!FIREBASE_READY){
+    document.getElementById('setup-hint').style.display='block';
+  }
+  if(FIREBASE_READY){
+    onAuthStateChanged(auth, async user=>{
+      if(user){
+        const snap = await getDoc(doc(db,'users',user.uid));
+        if(snap.exists()){
+          const data=snap.data();
+          currentUser={uid:user.uid,email:user.email,name:data.name,role:data.role,groupId:data.groupId||null};
+          enterApp(); return;
+        }
+      }
+      document.getElementById('login-screen').style.display='flex';
+    });
+  } else {
+    document.getElementById('login-screen').style.display='flex';
+  }
+}, 800);
+
+</script>
+</body>
+</html>
